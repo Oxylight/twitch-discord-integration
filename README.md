@@ -3,9 +3,9 @@ Simple script that alerts your audience that you have started a stream on Twitch
 TODO: insert image (example of alert)<br />
 ## Requirements
 1. Bash
-2. Curl 7.68.0
-2. Python 3.8.10
-3. [python-discord-webhook](https://github.com/lovvskillz/python-discord-webhook/) 0.16.3
+2. Curl
+2. Python3
+3. [python-discord-webhook](https://github.com/lovvskillz/python-discord-webhook/)
 4. Create app at [Twitch Developers](https://dev.twitch.tv/console), [docs](https://dev.twitch.tv/docs/api/get-started)
 ## Usage
 `./tw.dis.webhook.sh <discord_webhook> <twitch_client_id> <twitch_client_secret> <twitch-channel-name> <alert-text> <force preview or image link> <name-optional>`<br />
