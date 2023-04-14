@@ -15,16 +15,29 @@ fi
 
 echo [$(date)] : Started job >> $logs
 res=$(curl --silent -X POST https://id.twitch.tv/oauth2/token -H 'Content-Type: application/x-www-form-urlencoded' -d "client_id=$2&client_secret=$3&grant_type=client_credentials")
-oauth_token=$(echo $res | python3 -c "import sys, json; data=json.load(sys.stdin); print('error') if 'access_token' not in data else print(data['access_token'])")
+oauth_token=$(echo $res | python3 -c 'import sys, json; data=json.load(sys.stdin); print("error") if "access_token" not in data else print(data["access_token"])')
 if [[ $oauth_token == 'error' ]]
 then
   echo [$(date)] : ERROR - Exited because can not get oauth_token >> $logs
   exit
 fi
 
-chan_info=$(curl --silent -X GET https://api.twitch.tv/helix/streams?user_login=$4 -H "Authorization: Bearer $oauth_token" -H "Client-Id: $2")
-is_live=$(echo $chan_info | python3 -c "import sys, json; data=json.load(sys.stdin); not any(item for item in data.values()) and print('error')")
-if [[ $is_live == 'error' ]]
+chan_info=$(curl -s -X GET https://api.twitch.tv/helix/streams?user_login=$4 -H "Authorization: Bearer $oauth_token" -H "Client-Id: $2")
+is_live=$(echo $chan_info | python3 -c '
+import sys, json;
+try:
+  json_data=json.load(sys.stdin)
+except json.JSONDecodeError:
+  print("invalidJSON")
+else:
+  if json_data["data"][0]["type"] == "live":
+    print("live")
+  else:
+    print("offline")')
+
+#is_live=$(echo $chan_info | python3 -c 'import sys, json; try: json_data=json.load(sys.stdin) except json.JSONDecodeError: print("invalidJSON") else: if json_data["data"] and json_data["data"][0]["type"] == "live": print("live") else: print("offline")')
+#is_live=$(echo $chan_info | python3 -c "import sys, json; data=json.load(sys.stdin); not any(item for item in data.values()) and print('error')")
+if [[ $is_live == 'invalidJSON' || $is_live == 'offline' ]]
 then
   echo [$(date)] : OK - No stream detected >> $logs
   exit
