@@ -177,7 +177,7 @@ title=$(echo $chan_info | jq -r '.data[0].title')
 game=$(echo $chan_info | jq -r '.data[0].game_name')
 id=$(echo $chan_info | jq -r '.data[0].id')
 if [[ -z "$channel_name" ]]; then
-  channel_name=$(echo $chan_info | jq -r '.data.user_name')
+  channel_name=$(echo $chan_info | jq -r '.data[0].user_name')
 fi
 if [[ -z "$alert_text" ]]; then
   alert_text="$channel_name started a stream! @everyone"
@@ -197,11 +197,23 @@ if [[ -z "$preview_url" ]]; then
   python3 "$(dirname "$(realpath "$0")")"/webhook.py -webhook "$discord_webhook" -content "$alert_text" -stream_title "$title" -game "$game" -name "$channel_name" \
     -url "https://www.twitch.tv/$twitch_channel_login" -icon_url "$icon_url" -color "$color" -preview "$work_dir/preview.jpg"  
   rm $work_dir/preview.jpg
+  if [ $? -eq 0 ]
+  then
+      echo "Python script executed successfully."
+  else
+      echo "Python script encountered an error."
+  fi
   echo "[$(date)] : OK : Twitch-discord-integration : Alert sent with Twitch preview, exiting." >> $logs_file
   exit
 else
   python3 "$(dirname "$(realpath "$0")")"/webhook.py -webhook "$discord_webhook" -content "$alert_text" -stream_title "$title" -game "$game" -name "$channel_name" \
     -url "https://www.twitch.tv/$twitch_channel_login" -icon_url "$icon_url" -color "$color" -preview_url "$preview_url"  
+  if [ $? -eq 0 ]
+  then
+      echo "Python script executed successfully."
+  else
+      echo "Python script encountered an error."
+  fi
   echo "[$(date)] : OK : Twitch-discord-integration : Alert sent with custom preview, exiting." >> $logs_file
   exit
 fi
