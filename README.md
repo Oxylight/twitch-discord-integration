@@ -11,11 +11,11 @@ A script that notifies your audience that you have started a Twitch stream using
 `./main.sh --discord_webhook <discord_webhook> --twitch_client_id <twitch_client_id> --twitch_client_secret <twitch_client_secret> --twitch_channel_login <twitch-channel-login> --alert_text <alert-text> --preview_url <preview_url> --channel_name <channel_name> --icon_url <icon_url> --color <color> --logs_dir <logs_dir> --work_dir <work_dir>`<br />
 ## Arguments
 | Name | Description | How to obtain / Default | Required |
-| --- | --- | --- |
+| --- | --- | --- | --- |
 | `discord_webhook` | Discord webhook URL for sending alerts. | Create one at `<your server> -> Settings -> Integrations -> Webhooks`. | Yes |
 | `twitch_client_id` | Twitch dev app client ID. | Create app here: [Twitch Developers](https://dev.twitch.tv/console). | Yes |
 | `twitch_client_secret` | Twitch dev app client secret. | Create app here: [Twitch Developers](https://dev.twitch.tv/console). | Yes |
-| `twitch_channel_login` | Twitch channel login that used to track streams. | Can be taken from your Twitch URL https://twitch.tv/<twitch_login>. | Yes |
+| `twitch_channel_login` | Twitch channel login that used to track streams. | Can be taken from your Twitch URL: https://twitch.tv/<twitch_login>. | Yes |
 | `alert_text` | Text that will be used for alerts. Can not begin with '--'. | Default: `<channel_name> started a stream! @everyone`. | No |
 | `preview_url` | URL that leads to image that will be used as preview. | If not provided, Twitch preview will be used. | No |
 | `channel_name` | Custom channel name that will be used in alerts, does not affect twitch_channel_login. Can not begin with '--'. | Default: Twitch username. | No |
