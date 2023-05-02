@@ -140,7 +140,7 @@ if [ -e $work_dir/id.txt ]; then
 fi
 
 #Starting to work
-echo "[$(date)] : Twitch-discord-integration : Started." >> $logs_file
+echo "[$(date)] : INFO : Twitch-discord-integration : Started." >> $logs_file
 
 #Checking $discord_webhook for validity and setting up $icon_url
 discord_data=$(curl -s -X GET $discord_webhook)
@@ -172,7 +172,7 @@ if [ -f $work_dir/twitch_token.txt ]; then
     echo $expiration_time >> $work_dir/twitch_token.txt
     echo "[$(date)] : INFO : Twitch-discord-integration : Received new oauth_token." >> $logs_file
   fi
-  echo "[$(date)] : INFO : Twitch-discord-integration : Oauth_token is not expired, using it." >> $logs_file
+  echo "[$(date)] : INFO : Twitch-discord-integration : Oauth_token is not expired, using existing token." >> $logs_file
 else
   response=$(curl -s -X POST https://id.twitch.tv/oauth2/token -H 'Content-Type: application/x-www-form-urlencoded' \
     -d "client_id=$twitch_client_id&client_secret=$twitch_client_secret&grant_type=client_credentials")
