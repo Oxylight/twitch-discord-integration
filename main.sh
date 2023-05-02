@@ -135,8 +135,8 @@ if [[ ! -d $work_dir ]]; then
 fi
 
 #Checking stream ID file
-if [ -e $work_dir/id.txt ]; then
-    echo -1 > $work_dir/id.txt
+if [ ! -e $work_dir/id.txt ]; then
+  echo -1 > $work_dir/id.txt
 fi
 
 #Starting to work
@@ -153,40 +153,15 @@ if [[ -z "$icon_url" ]]; then
   icon_url="https://cdn.discordapp.com/avatars/$(echo $discord_data | jq -r '.id')/$(echo $discord_data | jq -r '.avatar').png"
 fi
 
-#Checking $twitch_token from file (if it exist) for validity, receiving new if expired
-if [ -f $work_dir/twitch_token.txt ]; then
-  readarray -t lines < $work_dir/twitch_token.txt
-  twitch_token="${lines[0]}"
-  expiration_time="${lines[1]}"
-  if [[ $(date +%s) -ge $expiration_time ]]; then
-    response=$(curl -s -X POST https://id.twitch.tv/oauth2/token -H 'Content-Type: application/x-www-form-urlencoded' \
-      -d "client_id=$twitch_client_id&client_secret=$twitch_client_secret&grant_type=client_credentials")
-    oauth_token=$(echo $response | jq -r '.access_token')
-    if [[ $oauth_token == null ]]; then
-      echo "[$(date)] : ERROR : Twitch-discord-integration : Can not get oauth_token, exiting." >> $logs_file
-      exit 1
-    fi
-    expires_in_seconds=$(echo $response | jq -r '.expires_in')
-    expiration_time=$(($(date +%s) + expires_in_seconds))
-    echo $oauth_token > $work_dir/twitch_token.txt
-    echo $expiration_time >> $work_dir/twitch_token.txt
-    echo "[$(date)] : INFO : Twitch-discord-integration : Received new oauth_token." >> $logs_file
-  fi
-  echo "[$(date)] : INFO : Twitch-discord-integration : Oauth_token is not expired, using existing token." >> $logs_file
-else
-  response=$(curl -s -X POST https://id.twitch.tv/oauth2/token -H 'Content-Type: application/x-www-form-urlencoded' \
-    -d "client_id=$twitch_client_id&client_secret=$twitch_client_secret&grant_type=client_credentials")
-  oauth_token=$(echo $response | jq -r '.access_token')
-  if [[ $oauth_token == null ]]; then
-    echo "[$(date)] : ERROR : Twitch-discord-integration : Can not get oauth_token, exiting." >> $logs_file
-    exit 1
-  fi
-  expires_in_seconds=$(echo $response | jq -r '.expires_in')
-  expiration_time=$(($(date +%s) + expires_in_seconds))
-  echo $oauth_token > $work_dir/twitch_token.txt
-  echo $expiration_time >> $work_dir/twitch_token.txt
-  echo "[$(date)] : INFO : Twitch-discord-integration : Received new oauth_token." >> $logs_file
+#Receiving $oauth_token for Twtich
+response=$(curl -s -X POST https://id.twitch.tv/oauth2/token -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d "client_id=$twitch_client_id&client_secret=$twitch_client_secret&grant_type=client_credentials")
+oauth_token=$(echo $response | jq -r '.access_token')
+if [[ $oauth_token == null ]]; then
+  echo "[$(date)] : ERROR : Twitch-discord-integration : Can not get oauth_token, exiting." >> $logs_file
+  exit 1
 fi
+echo "[$(date)] : INFO : Twitch-discord-integration : Received new oauth_token." >> $logs_file
 
 #Checking if stream is currently live
 chan_info=$(curl -s -X GET https://api.twitch.tv/helix/streams?user_login=$twitch_channel_login \
@@ -219,13 +194,13 @@ echo $id > id.txt
 #if preview_url is not provided then use Twitch preview
 if [[ -z "$preview_url" ]]; then
   curl https://static-cdn.jtvnw.net/previews-ttv/live_user_$twitch_channel_login.jpg --silent -o $work_dir/preview.jpg
-  python3 webhook.py -webhook "$discord_webhook" -content "$alert_text" -stream_title "$title" -game "$game" -name "$channel_name" \
+  python3 "$(dirname "$(realpath "$0")")"/webhook.py -webhook "$discord_webhook" -content "$alert_text" -stream_title "$title" -game "$game" -name "$channel_name" \
     -url "https://www.twitch.tv/$twitch_channel_login" -icon_url "$icon_url" -color "$color" -preview "$work_dir/preview.jpg"  
   rm $work_dir/preview.jpg
   echo "[$(date)] : OK : Twitch-discord-integration : Alert sent with Twitch preview, exiting." >> $logs_file
   exit
 else
-  python3 webhook.py -webhook "$discord_webhook" -content "$alert_text" -stream_title "$title" -game "$game" -name "$channel_name" \
+  python3 "$(dirname "$(realpath "$0")")"/webhook.py -webhook "$discord_webhook" -content "$alert_text" -stream_title "$title" -game "$game" -name "$channel_name" \
     -url "https://www.twitch.tv/$twitch_channel_login" -icon_url "$icon_url" -color "$color" -preview_url "$preview_url"  
   echo "[$(date)] : OK : Twitch-discord-integration : Alert sent with custom preview, exiting." >> $logs_file
   exit

@@ -20,7 +20,7 @@ args = parser.parse_args()
 content=args.content
 webhook = DiscordWebhook(url=args.webhook, rate_limit_retry=True, content = content)
 
-embed = DiscordEmbed(title=args.stream_title, description=args.game, color=args.color, url=args.url)
+embed = DiscordEmbed(title=args.stream_title, description=args.game, color=int(args.color), url=args.url)
 embed.set_author(name=args.name, url=args.url, icon_url=args.icon_url)
 if not args.preview_url: # if no image url provided, then use preview from stream
   with open(f"{args.preview}", "rb") as f:
