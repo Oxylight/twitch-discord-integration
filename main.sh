@@ -121,17 +121,17 @@ if [[ -z "$color" ]]; then
 fi
 if [[ -z "$logs_dir" ]]; then
   logs_dir='/var/log'
-  if [[ ! -d $logs_dir ]]; then
-    mkdir -p $logs_dir
-  fi
-  logs_file="$logs_dir/twitch-discord-integration-log.txt"
-  touch $logs_file
 fi
+if [[ ! -d $logs_dir ]]; then
+  mkdir -p $logs_dir
+fi
+logs_file="$logs_dir/twitch-discord-integration-log.txt"
+touch $logs_file
 if [[ -z "$work_dir" ]]; then
   work_dir='/etc/twitch-discord-integration'
-  if [[ ! -d $work_dir ]]; then
-    mkdir -p $work_dir
-  fi
+fi
+if [[ ! -d $work_dir ]]; then
+  mkdir -p $work_dir
 fi
 
 #Checking stream ID file
