@@ -189,7 +189,7 @@ then
   echo "[$(date)] : OK : Twitch-discord-integration : The same stream detected, exiting." >> $logs_file
   exit
 fi
-echo $id > id.txt
+echo $id > $work_dir/id.txt
 
 #if preview_url is not provided then use Twitch preview
 if [[ -z "$preview_url" ]]; then
