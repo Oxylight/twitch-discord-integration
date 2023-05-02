@@ -166,16 +166,16 @@ echo "[$(date)] : INFO : Twitch-discord-integration : Received new oauth_token."
 #Checking if stream is currently live
 chan_info=$(curl -s -X GET https://api.twitch.tv/helix/streams?user_login=$twitch_channel_login \
   -H "Authorization: Bearer $oauth_token" -H "Client-Id: $twitch_client_id")
-is_live=$(echo $chan_info | jq -r '.data.type')
+is_live=$(echo $chan_info | jq -r '.data[0].type')
 if [[ ! $is_live == "live" ]]; then
   echo "[$(date)] : OK : Twitch-discord-integration : Live stream is not detected, exiting." >> $logs_file
   exit
 fi
 
 #Getting stream data
-title=$(echo $chan_info | jq -r '.data.title')
-game=$(echo $chan_info | jq -r '.data.game_name')
-id=$(echo $chan_info | jq -r '.data.id')
+title=$(echo $chan_info | jq -r '.data[0].title')
+game=$(echo $chan_info | jq -r '.data[0].game_name')
+id=$(echo $chan_info | jq -r '.data[0].id')
 if [[ -z "$channel_name" ]]; then
   channel_name=$(echo $chan_info | jq -r '.data.user_name')
 fi
