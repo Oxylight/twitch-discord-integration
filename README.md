@@ -14,8 +14,9 @@ Setup (link) your config.<br />
 Add execute rights to script: `sudo chmod u+x twitch-discord-integration/main.sh`.<br />
 Run it!<br />
 ## Usage
-`./main.sh`<br /> or `./main.sh -c <path-to-config>`<br />.
-Optionally you can make a cronjob: `sudo crontab -e`. Add line to the end of file `* * * * * /your/path/to/script/main.sh`<br />
+`./main.sh` or `./main.sh -c <path-to-config>`.<br />
+Optionally you can make a cronjob: `sudo crontab -e`.<br />
+Add line to the end of file `* * * * * /your/path/to/script/main.sh`.<br />
 ## Configuring
 Config file should have UTF-8 encoding.<br />
 Structure of config: `key=value`, use `''` or `""` for value if you want to use value with spaces (for example, in alert text).<br />
