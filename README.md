@@ -8,16 +8,16 @@ A script that notifies your audience that you have started a Twitch stream using
 5. [python-discord-webhook](https://github.com/lovvskillz/python-discord-webhook/) and all requirements
 6. Twitch dev app (create one here: [Twitch Developers](https://dev.twitch.tv/console)), [docs](https://dev.twitch.tv/docs/api/get-started)
 ## Installation
-TODO (add your-path etc)
-Clone project with git: `git clone https://github.com/Oxylight/twitch-discord-integration.git`.
-Setup (link) your config.
-Add execute rights to script: `sudo chmod u+x twitch-discord-integration/main.sh`.
-Run it!
+TODO (add your-path etc)<br />
+Clone project with git: `git clone https://github.com/Oxylight/twitch-discord-integration.git`.<br />
+Setup (link) your config.<br />
+Add execute rights to script: `sudo chmod u+x twitch-discord-integration/main.sh`.<br />
+Run it!<br />
 ## Usage
 `./main.sh`<br /> or `./main.sh -c <path-to-config>`<br />.
-Optionally you can make a cronjob: `sudo crontab -e`. Add line to the end of file `* * * * * /your/path/to/script/main.sh`
+Optionally you can make a cronjob: `sudo crontab -e`. Add line to the end of file `* * * * * /your/path/to/script/main.sh`<br />
 ## Configuring
-Config file should have UTF-8 encoding.
+Config file should have UTF-8 encoding.<br />
 Structure of config: `key=value`, use `''` or `""` for value if you want to use value with spaces (for example, in alert text).<br />
 | Name | Description | How to obtain / Default | Required |
 | --- | --- | --- | --- |
