@@ -56,19 +56,19 @@ fi
 
 # Checking required variables
 if [[ -z "$discord_webhook" ]]; then
-  echo "[$(date)] : ERROR : Twitch-discord-integration check : Variable 'discord_webhook' is required, exiting."
+  echo "[$(date)] : ERROR : Twitch-discord-integration check : Variable 'discord_webhook' is required, exiting." >> $logs_file
   exit 1
 fi
 if [[ -z "$twitch_client_id" ]]; then
-  echo "[$(date)] : ERROR : Twitch-discord-integration check : Variable 'twitch_client_id' is required, exiting."
+  echo "[$(date)] : ERROR : Twitch-discord-integration check : Variable 'twitch_client_id' is required, exiting." >> $logs_file
   exit 1
 fi
 if [[ -z "$twitch_client_secret" ]]; then
-  echo "[$(date)] : ERROR : Twitch-discord-integration check : Variable 'twitch_client_secret' is required, exiting."
+  echo "[$(date)] : ERROR : Twitch-discord-integration check : Variable 'twitch_client_secret' is required, exiting." >> $logs_file
   exit 1
 fi
 if [[ -z "$twitch_channel_login" ]]; then
-  echo "[$(date)] : ERROR : Twitch-discord-integration check : Variable 'twitch_channel_login' is required, exiting."
+  echo "[$(date)] : ERROR : Twitch-discord-integration check : Variable 'twitch_channel_login' is required, exiting." >> $logs_file
   exit 1
 fi
 if [[ -z "$color" ]]; then
@@ -90,13 +90,6 @@ if [[ $(echo $discord_data | jq -r '.id') == null ]]; then
   exit 1
 fi
 
-# Setting up $icon_url
-if [[ -z "$icon_url" ]]; then
-  # If icon_url is not provided, then Discord webhook avatar is used
-  icon_url="https://cdn.discordapp.com/avatars/$(echo $discord_data | jq -r '.id')/$(echo $discord_data | jq -r '.avatar').png"
-  # TODO: use Twitch channel icon instead of Discord webhook icon or let user choose in conf
-fi
-
 # Receiving $oauth_token for Twtich
 response=$(curl -s -X POST https://id.twitch.tv/oauth2/token -H 'Content-Type: application/x-www-form-urlencoded' \
   -d "client_id=$twitch_client_id&client_secret=$twitch_client_secret&grant_type=client_credentials")
@@ -105,7 +98,7 @@ if [[ $oauth_token == null ]]; then
   echo "[$(date)] : ERROR : Twitch-discord-integration : Can not get oauth_token, exiting." >> $logs_file
   exit 1
 fi
-echo "[$(date)] : INFO : Twitch-discord-integration : Received new oauth_token." >> $logs_file
+echo "[$(date)] : INFO : Twitch-discord-integration : Received oauth_token." >> $logs_file
 
 # Checking if stream is currently live
 chan_info=$(curl -s -X GET https://api.twitch.tv/helix/streams?user_login=$twitch_channel_login \
@@ -114,6 +107,15 @@ is_live=$(echo $chan_info | jq -r '.data[0].type')
 if [[ ! $is_live == "live" ]]; then
   echo "[$(date)] : OK : Twitch-discord-integration : Live stream is not detected, exiting." >> $logs_file
   exit
+fi
+
+# Setting up $icon_url
+if [ "$icon_url" = "discord" ]; then
+  icon_url="https://cdn.discordapp.com/avatars/$(echo $discord_data | jq -r '.id')/$(echo $discord_data | jq -r '.avatar').png"
+elif [ "$icon_url" = "twitch" ] || [ -z "$icon_url" ]; then
+  icon_request=$(curl -s -X GET https://api.twitch.tv/helix/users?login=$twitch_channel_login \
+    -H "Authorization: Bearer $oauth_token" -H "Client-Id: $twitch_client_id")
+  icon_url=$(echo $icon_request | jq -r '.data[0].profile_image_url')
 fi
 
 # Getting stream data
@@ -142,22 +144,23 @@ if [[ -z "$preview_url" ]]; then
     -url "https://www.twitch.tv/$twitch_channel_login" -icon_url "$icon_url" -color "$color" -preview "$work_dir/preview.jpg"  
   if [ $? -eq 0 ]
   then
-      echo "Python script executed successfully." #DEBUG
+      echo "[$(date)] : OK : Twitch-discord-integration : Alert sent with Twitch preview, exiting." >> $logs_file
+      rm $work_dir/preview.jpg
+      exit
   else
-      echo "Python script encountered an error." #DEBUG
+      "[$(date)] : ERROR : Twitch-discord-integration : Alert sending failed for unknown reason, exiting." >> $logs_file
+      rm $work_dir/preview.jpg
+      exit 1
   fi
-  rm $work_dir/preview.jpg
-  echo "[$(date)] : OK : Twitch-discord-integration : Alert sent with Twitch preview, exiting." >> $logs_file
-  exit
 else
   python3 "$(dirname "$(realpath "$0")")"/webhook.py -webhook "$discord_webhook" -content "$alert_text" -stream_title "$title" -game "$game" -name "$channel_name" \
     -url "https://www.twitch.tv/$twitch_channel_login" -icon_url "$icon_url" -color "$color" -preview_url "$preview_url"  
   if [ $? -eq 0 ]
   then
-      echo "Python script executed successfully."
+      echo "[$(date)] : OK : Twitch-discord-integration : Alert sent with custom preview, exiting." >> $logs_file
+      exit
   else
-      echo "Python script encountered an error."
+      "[$(date)] : ERROR : Twitch-discord-integration : Alert sending failed for unknown reason, exiting." >> $logs_file
+      exit 1
   fi
-  echo "[$(date)] : OK : Twitch-discord-integration : Alert sent with custom preview, exiting." >> $logs_file
-  exit
 fi
