@@ -11,7 +11,7 @@ A script that notifies your audience that you have started a Twitch stream using
 TODO (add your-path etc)<br />
 Clone project with git: `git clone https://github.com/Oxylight/twitch-discord-integration.git`.<br />
 Setup (link) your config.<br />
-Add execute rights to script: `sudo chmod u+x twitch-discord-integration/main.sh`.<br />
+Add execute rights to script: `sudo chmod u+x /your/path/to/script/main.sh`.<br />
 Run it!<br />
 ## Usage
 `./main.sh` or `./main.sh -c <path-to-config>`.<br />
