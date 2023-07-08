@@ -40,7 +40,5 @@ This project is not affiliated with Twitch or Discord or any other company. Any 
 ## TODO
 1. Create help page.
 2. Create log-level setting.
-3. Get user avatar from Twitch to use as icon_url.
-4. Fix known bugs.
 ## Known bugs
-1. `'` in fields (for example in description) can break script. Probably would be fixed by erasing them like `tr -d "'" | tr -d '"'` or `sed "s/['\"]//g"`.
+1. ~`'` in fields (for example in description) can break script. Probably would be fixed by erasing them like `tr -d "'" | tr -d '"'` or `sed "s/['\"]//g"`.~ Probably fixed.

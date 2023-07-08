@@ -54,6 +54,9 @@ if [[ ! -d $work_dir ]]; then
   mkdir -p $work_dir
 fi
 
+# Starting to work
+echo "[$(date)] : INFO : Twitch-discord-integration : Started." >> $logs_file
+
 # Checking required variables
 if [[ -z "$discord_webhook" ]]; then
   echo "[$(date)] : ERROR : Twitch-discord-integration check : Variable 'discord_webhook' is required, exiting." >> $logs_file
@@ -74,9 +77,6 @@ fi
 if [[ -z "$color" ]]; then
   color=6570404
 fi
-
-# Starting to work
-echo "[$(date)] : INFO : Twitch-discord-integration : Started." >> $logs_file
 
 # Checking stream ID file
 if [ ! -e $work_dir/id.txt ]; then
@@ -136,6 +136,12 @@ then
   exit
 fi
 echo $id > $work_dir/id.txt
+
+# Erasing ' and " to prevent crashing while calling Python
+alert_text=$(echo "$alert_text" | tr -d "\'" | tr -d '\"')
+title=$(echo "$title" | tr -d "\'" | tr -d '\"')
+game=$(echo "$game" | tr -d "\'" | tr -d '\"')
+channel_name=$(echo "$channel_name" | tr -d "\'" | tr -d '\"')
 
 # If preview_url is not provided then use Twitch preview
 if [[ -z "$preview_url" ]]; then
